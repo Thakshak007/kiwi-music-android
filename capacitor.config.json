@@ -1,0 +1,10 @@
+{
+  "appId": "com.kiwi.music",
+  "appName": "kiwi Music",
+  "webDir": "public",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

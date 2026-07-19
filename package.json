@@ -1,0 +1,20 @@
+{
+  "name": "kiwi-music",
+  "version": "1.0.0",
+  "description": "Offline local music player with global hotkeys support",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . kiwi-music --platform=win32 --arch=x64 --overwrite --out=dist"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "electron": "^31.0.0",
+    "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
