@@ -11,7 +11,7 @@ Desktop.ini
 *.log
 
 # Debug/Temp outputs
-*.html
+/*.html
 test-*.js
 inspect-*.js
 debug-*.js

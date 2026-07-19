@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kiwi Music - Offline Local Player</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Left Sidebar: Controls & Search -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-icon">
+          <i data-lucide="music-4"></i>
+        </div>
+        <div class="brand-text">
+          <h1>kiwi Music</h1>
+          <span>Offline Local Player</span>
+        </div>
+      </div>
+
+      <!-- Navigation tabs -->
+      <div class="nav-tabs">
+        <button class="nav-btn active" id="nav-library-btn">
+          <i data-lucide="library"></i>
+          <span>Library</span>
+        </button>
+        <button class="nav-btn" id="nav-queue-btn">
+          <i data-lucide="list-music"></i>
+          <span>Queue</span>
+          <span class="queue-badge hidden" id="queue-badge">0</span>
+        </button>
+        <button class="nav-btn" id="nav-downloader-btn">
+          <i data-lucide="cloud-download"></i>
+          <span>Downloader</span>
+        </button>
+      </div>
+
+      <!-- Library Search Section -->
+      <div class="search-card" id="sidebar-search-card">
+        <div class="search-header">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="search-input" placeholder="Search library...">
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <button class="action-btn" id="refresh-btn" title="Scan computer folders">
+        <i data-lucide="refresh-cw"></i>
+        <span id="refresh-btn-text">Scan All Folders</span>
+      </button>
+      <input type="file" id="mobile-file-input" class="hidden" multiple accept="audio/*">
+
+      <!-- Background Play Info -->
+      <div class="guide-card">
+        <h3>System Media Keys</h3>
+        <p class="guide-desc">kiwi Music controls your music in the background of any app or game using your keyboard media keys:</p>
+        <ul class="command-list">
+          <li>
+            <kbd>⏯ Play / Pause</kbd>
+            <span>Toggle playback</span>
+          </li>
+          <li>
+            <kbd>⏭ Next Track</kbd>
+            <span>Skip to next song</span>
+          </li>
+          <li>
+            <kbd>⏮ Prev Track</kbd>
+            <span>Go back to previous</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Keyboard Shortcuts -->
+      <div class="shortcut-card">
+        <h3>App Shortcuts</h3>
+        <div class="shortcut-row">
+          <kbd>Spacebar</kbd>
+          <span>Play / Pause</span>
+        </div>
+        <div class="shortcut-row">
+          <kbd>Ctrl + F</kbd>
+          <span>Focus Search</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="main-content">
+      
+      <!-- 1. LIBRARY VIEW -->
+      <div class="view-panel" id="library-view">
+        <header class="content-header">
+          <div class="header-title">
+            <h2>Local Audio Library</h2>
+            <p id="songs-found-text">0 Audio Files Scanned</p>
+          </div>
+          
+          <!-- Library Actions & Tabs -->
+          <div class="header-actions">
+            <!-- Category Tabs -->
+            <div class="category-tabs">
+              <button class="tab-btn active" id="tab-music" title="Filter by Music/Songs">
+                <i data-lucide="music-2"></i>
+                <span>Music Audio</span>
+              </button>
+              <button class="tab-btn" id="tab-speech" title="Filter by Spoken Audio/Voice recordings">
+                <i data-lucide="mic"></i>
+                <span>Spoken Audio</span>
+              </button>
+            </div>
+            
+            <!-- Manage Toggle Button -->
+            <button class="manage-btn" id="manage-library-btn" title="Select and delete multiple files">
+              <i data-lucide="edit-3"></i>
+              <span>Manage</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Bulk Actions Action Panel (Shown only when in Manage Mode) -->
+        <div class="bulk-actions-bar hidden" id="bulk-actions-bar">
+          <div class="bulk-info">
+            <i data-lucide="info"></i>
+            <span id="selected-count-text">0 songs selected</span>
+          </div>
+          <div class="bulk-buttons">
+            <button class="bulk-btn select-all-btn" id="select-all-btn">
+              <i data-lucide="check-square"></i>
+              <span>Select All</span>
+            </button>
+            <button class="bulk-btn delete-selected-btn" id="delete-selected-btn">
+              <i data-lucide="trash-2"></i>
+              <span>Delete Permanent</span>
+            </button>
+            <button class="bulk-btn cancel-bulk-btn" id="cancel-bulk-btn">
+              <span>Cancel</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Songs list table -->
+        <section class="songs-section" id="songs-section-container">
+          <div class="songs-list-header">
+            <div class="col-checkbox"><input type="checkbox" id="header-select-all-checkbox"></div>
+            <div class="col-index">#</div>
+            <div class="col-title">Title</div>
+            <div class="col-artist">Artist</div>
+            <div class="col-folder">Folder</div>
+            <div class="col-size">Size</div>
+            <div class="col-action"></div>
+          </div>
+          
+          <div class="songs-list" id="songs-list">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Scanning your computer folders...</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 2. QUEUE VIEW (Hidden by default) -->
+      <div class="view-panel hidden" id="queue-view">
+        <header class="content-header">
+          <div class="header-title">
+            <h2>Playback Queue</h2>
+            <p id="queue-count-text">0 Songs in Queue</p>
+          </div>
+          <div class="header-actions">
+            <button class="manage-btn" id="clear-queue-btn" style="border-color: rgba(243, 85, 136, 0.3); color: var(--accent-pink);" title="Remove all items from queue">
+              <i data-lucide="trash-2"></i>
+              <span>Clear Queue</span>
+            </button>
+          </div>
+        </header>
+
+        <section class="songs-section">
+          <div class="songs-list-header" style="grid-template-columns: 50px 1fr 1fr 140px 120px 80px;">
+            <div class="col-index">#</div>
+            <div class="col-title">Title</div>
+            <div class="col-artist">Artist</div>
+            <div class="col-folder">Folder</div>
+            <div class="col-size">Size</div>
+            <div class="col-action"></div>
+          </div>
+          
+          <div class="songs-list" id="queue-list-container">
+            <div class="no-songs-state">
+              <i data-lucide="list-music"></i>
+              <h4>Queue is empty</h4>
+              <p>Add songs to the queue from the library by clicking the "+" button next to them.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 3. DOWNLOADER VIEW (Hidden by default) -->
+      <div class="view-panel hidden" id="downloader-view">
+        <header class="content-header">
+          <div class="header-title">
+            <h2>Online Song Downloader</h2>
+            <p>Crawls djpunjab, pandujaat, naasongs, pagalworld, sensongsmp3, mr-jatt</p>
+          </div>
+        </header>
+
+        <section class="downloader-section">
+          <div class="downloader-form">
+            <div class="form-inputs">
+              <div class="input-group">
+                <label for="dl-song-name">Song Name / Title</label>
+                <input type="text" id="dl-song-name" placeholder="e.g. Mastaaru Mastaaru, Jaadu, Maleye Maleye">
+              </div>
+              <div class="input-group">
+                <label for="dl-language">Language</label>
+                <input type="text" id="dl-language" placeholder="e.g. Telugu, Punjabi, Kannada, Hindi">
+              </div>
+            </div>
+            
+            <button class="dl-search-btn" id="dl-search-btn">
+              <i data-lucide="search"></i>
+              <span>Crawl & Find Links</span>
+            </button>
+          </div>
+
+          <div class="downloader-results-title">
+            <h3>Download Links Found</h3>
+          </div>
+
+          <div class="downloader-results" id="downloader-results">
+            <div class="no-results-state">
+              <i data-lucide="download-cloud"></i>
+              <h4>Ready to Crawl</h4>
+              <p>Enter a song name and language to crawl online MP3 files.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Bottom Audio Player Drawer (Shared across views) -->
+      <footer class="player-drawer">
+        <div class="player-left">
+          <div class="now-playing-art">
+            <i data-lucide="music" class="music-art-icon" id="playing-art-icon"></i>
+          </div>
+          <div class="now-playing-meta">
+            <h4 id="player-title" class="truncate">No Song Playing</h4>
+            <p id="player-artist" class="truncate">Select an audio file</p>
+          </div>
+        </div>
+
+        <div class="player-center">
+          <div class="player-controls">
+            <button class="control-btn" id="prev-btn" title="Previous Track">
+              <i data-lucide="skip-back"></i>
+            </button>
+            <button class="control-btn play-btn" id="play-btn" title="Play / Pause" style="display: flex; align-items: center; justify-content: center;">
+              <!-- Initially static play icon; script replaces it with custom SVG playing block -->
+              <span id="play-btn-icon" style="display: block;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                  <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>
+                </svg>
+              </span>
+            </button>
+            <button class="control-btn" id="next-btn" title="Next Track">
+              <i data-lucide="skip-forward"></i>
+            </button>
+          </div>
+
+          <div class="player-progress-container">
+            <span class="time-stamp" id="current-time">0:00</span>
+            <div class="progress-bar-wrapper" id="progress-wrapper">
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+              </div>
+            </div>
+            <span class="time-stamp" id="duration-time">0:00</span>
+          </div>
+        </div>
+
+        <div class="player-right">
+          <div class="visualizer-bars" id="audio-visualizer-bars">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </div>
+          
+          <div class="volume-container">
+            <button class="volume-btn" id="volume-toggle" title="Mute/Unmute">
+              <i data-lucide="volume-2" id="volume-icon"></i>
+            </button>
+            <div class="volume-slider-wrapper" id="volume-slider-wrapper">
+              <div class="volume-slider-bg">
+                <div class="volume-slider-fill" id="volume-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+  </div>
+
+  <!-- Audio Element -->
+  <audio id="audio-player"></audio>
+
+  <script src="app.js"></script>
+</body>
+</html>
