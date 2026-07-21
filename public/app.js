@@ -147,8 +147,13 @@ if (mobileFileInput) {
       </div>
     `;
 
-    for (const file of filesList) {
-      await addSongToIndexedDB(file);
+    try {
+      for (const file of filesList) {
+        await addSongToIndexedDB(file);
+      }
+    } catch (err) {
+      console.error('Import failed:', err);
+      alert(`Import failed: ${err.message || err}`);
     }
     mobileFileInput.value = ''; // Reset file input
     loadSongs();
@@ -157,6 +162,15 @@ if (mobileFileInput) {
 
 function addSongToIndexedDB(file) {
   return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized. Please try again."));
+      return;
+    }
+    
+    // Copy File object to a clean standard Blob.
+    // Android WebViews prevent storing native File handles due to security constraints.
+    const fileBlob = new Blob([file], { type: file.type || 'audio/mpeg' });
+
     const transaction = db.transaction(['songs'], 'readwrite');
     const store = transaction.objectStore('songs');
     
@@ -171,7 +185,7 @@ function addSongToIndexedDB(file) {
       folder: 'Imported',
       category: category,
       mtime: Date.now(),
-      blob: file // Store File/Blob directly
+      blob: fileBlob // Store binary Blob directly
     };
     
     const request = store.add(songData);
