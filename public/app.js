@@ -1,5 +1,14 @@
 // Environment Detection
 const isElectron = (window.kiwiAPI !== undefined);
+const isCapacitor = (window.Capacitor !== undefined);
+
+function getBypassedUrl(url) {
+  if (isElectron || isCapacitor) {
+    return url;
+  }
+  // Standard web browser - proxy via server.js
+  return `/api/proxy?url=${encodeURIComponent(url)}`;
+}
 
 // State Management
 let songs = [];
@@ -1114,7 +1123,7 @@ window.playOnlinePreview = async (url, title, source) => {
     }
   }
 
-  audio.src = streamUrl;
+  audio.src = getBypassedUrl(streamUrl);
   audio.load();
 
   playerTitle.innerText = title;
@@ -1174,7 +1183,7 @@ window.startDownload = async (url, filename, cleanId) => {
         barEl.style.width = '50%';
       }
 
-      const res = await fetch(downloadUrl);
+      const res = await fetch(getBypassedUrl(downloadUrl));
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const blob = await res.blob();
       
@@ -1229,13 +1238,13 @@ window.startDownload = async (url, filename, cleanId) => {
 // 9. Mobile/Web Client Helper Utilities
 // ----------------------------------------------------
 async function clientFetchTextUrl(url) {
-  const response = await fetch(url);
+  const response = await fetch(getBypassedUrl(url));
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return await response.text();
 }
 
 async function getCobaltAudioStream(url) {
-  const response = await fetch('https://api.cobalt.tools/', {
+  const response = await fetch(getBypassedUrl('https://api.cobalt.tools/'), {
     method: 'POST',
     headers: {
       'Accept': 'application/json',

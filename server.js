@@ -161,6 +161,36 @@ app.get('/api/songs/stream/:filename', (req, res) => {
   }
 });
 
+const https = require('https');
+const http = require('http');
+
+app.get('/api/proxy', (req, res) => {
+  const targetUrl = req.query.url;
+  if (!targetUrl) {
+    return res.status(400).send('URL is required');
+  }
+
+  const client = targetUrl.startsWith('https') ? https : http;
+  
+  client.get(targetUrl, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
+  }, (targetRes) => {
+    // Copy content-type and content-length headers from target
+    res.setHeader('Content-Type', targetRes.headers['content-type'] || 'audio/mpeg');
+    if (targetRes.headers['content-length']) {
+      res.setHeader('Content-Length', targetRes.headers['content-length']);
+    }
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    
+    targetRes.pipe(res);
+  }).on('error', (err) => {
+    console.error('Proxy error:', err);
+    res.status(500).send(err.message);
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

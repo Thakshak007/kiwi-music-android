@@ -51,11 +51,7 @@
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <button class="action-btn" id="refresh-btn" title="Scan computer folders">
-        <i data-lucide="refresh-cw"></i>
-        <span id="refresh-btn-text">Scan All Folders</span>
-      </button>
+      <!-- Hidden file input for mobile import -->
       <input type="file" id="mobile-file-input" class="hidden" multiple accept="audio/*">
 
       <!-- Background Play Info -->
@@ -121,6 +117,12 @@
             <button class="manage-btn" id="manage-library-btn" title="Select and delete multiple files">
               <i data-lucide="edit-3"></i>
               <span>Manage</span>
+            </button>
+
+            <!-- Scan / Import Button -->
+            <button class="manage-btn" id="refresh-btn" title="Scan computer folders">
+              <i data-lucide="refresh-cw"></i>
+              <span id="refresh-btn-text">Scan All Folders</span>
             </button>
           </div>
         </header>

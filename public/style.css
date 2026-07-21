@@ -1711,14 +1711,37 @@ body {
     flex-shrink: 0;
   }
 
-  /* Simpler controls on mobile drawer */
+  /* Thin progress bar at the top of the mobile player drawer */
   .player-drawer .player-progress-container {
-    display: none !important; /* Hide progress bar in collapsed drawer */
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 3px !important;
+    display: block !important;
+  }
+
+  .player-drawer .player-progress-container .time {
+    display: none !important; /* Hide time labels on mobile bar */
+  }
+
+  .player-drawer .progress-wrapper {
+    width: 100% !important;
+    height: 3px !important;
+    border-radius: 0 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    margin: 0 !important;
+  }
+
+  .player-drawer .progress-fill {
+    border-radius: 0 !important;
   }
 
   .player-drawer #prev-btn,
   .player-drawer #next-btn {
-    display: none !important;
+    display: flex !important;
   }
 
   /* Downloader Tab Touch Inputs */
