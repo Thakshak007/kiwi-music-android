@@ -1238,23 +1238,74 @@ window.startDownload = async (url, filename, cleanId) => {
 // 9. Mobile/Web Client Helper Utilities
 // ----------------------------------------------------
 async function clientFetchTextUrl(url) {
-  const response = await fetch(getBypassedUrl(url));
+  const desktopUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+  // If in Capacitor, use native CapacitorHttp plugin explicitly to guarantee CORS bypass & UA spoofing
+  if (isCapacitor && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp) {
+    try {
+      const options = {
+        url: url,
+        method: 'GET',
+        headers: {
+          'User-Agent': desktopUA
+        }
+      };
+      const response = await window.Capacitor.Plugins.CapacitorHttp.get(options);
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.data;
+    } catch (e) {
+      console.error('CapacitorHttp native fetch failed, falling back to fetch:', e);
+    }
+  }
+
+  // Fallback to standard fetch
+  const response = await fetch(getBypassedUrl(url), {
+    headers: {
+      'User-Agent': desktopUA
+    }
+  });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return await response.text();
 }
 
 async function getCobaltAudioStream(url) {
+  const postData = {
+    url: url,
+    audioOnly: true,
+    aFormat: 'mp3'
+  };
+
+  // If in Capacitor, use native CapacitorHttp plugin explicitly
+  if (isCapacitor && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp) {
+    try {
+      const response = await window.Capacitor.Plugins.CapacitorHttp.post({
+        url: 'https://api.cobalt.tools/',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        data: postData
+      });
+      const json = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+      if (json.status === 'redirect' || json.status === 'tunnel') {
+        return json.url;
+      }
+      throw new Error(json.text || 'Cobalt extraction failed');
+    } catch (e) {
+      console.error('CapacitorHttp native post failed, falling back to fetch:', e);
+    }
+  }
+
+  // Fallback to standard fetch
   const response = await fetch(getBypassedUrl('https://api.cobalt.tools/'), {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      url: url,
-      audioOnly: true,
-      aFormat: 'mp3'
-    })
+    body: JSON.stringify(postData)
   });
   if (!response.ok) throw new Error(`Cobalt HTTP ${response.status}`);
   const json = await response.json();
