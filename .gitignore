@@ -1,3 +1,10 @@
+# Flutter / Dart rules
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+
 # Dependency directories
 node_modules/
 
@@ -9,12 +16,3 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 *.log
-
-# Debug/Temp outputs
-/*.html
-test-*.js
-inspect-*.js
-debug-*.js
-parse-*.js
-save-*.js
-scrape-*.js

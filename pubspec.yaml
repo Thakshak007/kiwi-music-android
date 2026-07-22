@@ -1,0 +1,27 @@
+name: kiwi_music
+description: "Kiwi Music - Native Android Local Music Player and Downloader"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  on_audio_query: ^3.0.0
+  just_audio: ^0.9.36
+  audio_service: ^0.18.12
+  permission_handler: ^11.3.1
+  http: ^1.2.1
+  path_provider: ^2.1.2
+  provider: ^6.1.1
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
